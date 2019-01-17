@@ -1,0 +1,14 @@
+{
+  "name": "github_status",
+  "version": "1.0.0",
+  "description": "Cloud function to send cloud build status to github",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@octokit/rest": "^15.2.6"
+  }
+}
