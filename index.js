@@ -2,6 +2,7 @@
 
 const octokit = require('@octokit/rest')();
 const GITHUB_ACCESS_TOKEN = process.env.GITHUB_TOKEN;
+const _ = require('lodash');
 
 /**
  * Background Cloud Function to be triggered by cloud-builds Pub/Sub topic.
@@ -41,18 +42,33 @@ function postBuildStatus(build) {
 }
 
 function getRepo(build) {
-  let repoNameRe = /^(.*)_(.*)_(.*)$/;
-  let repoName = build.source.repoSource.repoName;
-  let match = repoNameRe.exec(repoName);
-  if (!match) {
-    console.error(`Cannot parse repoName: ${repoName}`);
-    return null;
+  if ( build.source ) {
+    let repoNameRe = /^(.*)_(.*)_(.*)$/;
+    let repoName = build.source.repoSource.repoName;
+    let match = repoNameRe.exec(repoName);
+    if (!match) {
+      console.error(`Cannot parse repoName: ${repoName}`);
+      return null;
+    }
+    return {
+      site: match[1],
+      user: match[2],
+      name: match[3]
+    };
+  } else {
+    // Getting repo URL from the first step (the clone)
+    const raw_repo = build.steps[0].args[1];
+    // removing unnecessary parts and spliting by /
+    const repo = raw_repo.match("https://(.*)\.git")[1].replace(".com","").split("/");
+
+    // Getting the commit from the second step (the checkout)
+    _.set(build, "sourceProvenance.resolvedRepoSource.commitSha", build.steps[1].args[1]);
+    return {
+      site: repo[0],
+      user: repo[1],
+      name: repo[2]
+    };
   }
-  return {
-    site: match[1],
-    user: match[2],
-    name: match[3]
-  };
 }
 
 function buildToGithubStatus(build) {

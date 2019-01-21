@@ -9,6 +9,7 @@
   "author": "",
   "license": "UNLICENSED",
   "dependencies": {
-    "@octokit/rest": "^15.2.6"
+    "@octokit/rest": "^15.2.6",
+    "lodash": "^4.17.11"
   }
 }
