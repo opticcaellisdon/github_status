@@ -57,16 +57,16 @@ function getRepo(build) {
     };
   } else {
     // Getting repo URL from the first step (the clone)
-    const raw_repo = build.steps[0].args[1];
+    const raw_repo = build.steps[4].args[1];
     // removing unnecessary parts and spliting by /
-    const repo = raw_repo.match("https://(.*)\.git")[1].replace(".com","").split("/");
+    const repo = raw_repo.match("git@(.*)\.com:(.*)/(.*)\.git");
 
     // Getting the commit from the second step (the checkout)
-    _.set(build, "sourceProvenance.resolvedRepoSource.commitSha", build.steps[1].args[1]);
+    _.set(build, "sourceProvenance.resolvedRepoSource.commitSha", build.steps[5].args[1]);
     return {
-      site: repo[0],
-      user: repo[1],
-      name: repo[2]
+      site: repo[1],
+      user: repo[2],
+      name: repo[3]
     };
   }
 }
